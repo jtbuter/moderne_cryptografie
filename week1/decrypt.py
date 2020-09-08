@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 
 MAX_KEY = 14
@@ -67,8 +68,13 @@ def get_key(cipher, length):
 	return key
 
 def main():
-	# Conver hex from first line to bytes.
-	with open("ciphertext.txt", "r") as f:
+	target = "ciphertext.txt"
+
+	if len(sys.argv) > 1:
+		target = sys.argv.pop()
+
+	# Convert hex from first line of file to bytes.
+	with open(target, "r") as f:
 		cipher = bytes.fromhex(f.readline())
 
 	key_length = get_length(cipher)
