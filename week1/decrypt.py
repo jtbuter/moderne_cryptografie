@@ -21,16 +21,28 @@ def get_key(cipher, length):
 
 	for i in range(length):
 		stream = cipher[i::length]
+		shift_bag = np.array([0.] * 256)
 
 		for shift in range(256):
-			bag = np.array([0] * 256)
+			invalid_message_space = False
+			frequency_bag = np.array([0] * 27)
 
 			for c in decode(stream, shift):
-				bag[c] += 1
+				if c < 32 or c > 126:
+					invalid_message_space = True
+					break
+				
+				if c >= 97 and c <= 122:
+					frequency_bag[c - 97] += 1
+				if c == 32:
+					frequency_bag[c - 6] += 1
 
-			if np.argmax(bag) == 32:
-				key.append(shift)
-				break	
+			if invalid_message_space:
+				continue
+
+			shift_bag[shift] = np.sum((frequency_bag / len(stream)) ** 2)
+
+		key.append(np.argmax(shift_bag))
 
 	return key
 
